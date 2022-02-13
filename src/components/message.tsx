@@ -20,7 +20,7 @@ export default function Message({ message }: Props) {
 
         const timer = setTimeout(() => {
             setShowMessage(false);
-        }, 3000);
+        }, 5000);
 
         return () => clearTimeout(timer);
 
@@ -31,7 +31,7 @@ export default function Message({ message }: Props) {
     }
 
     return (
-        <Row style={{ position: 'fixed', width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}>
+        <Row style={{ position: 'fixed', width: '100%', height: '100%', display: 'flex', alignItems: 'center', zIndex:999 }}>
             <Col className="d-flex flex-column min-vh-100 justify-content-center align-items-center" style={{ display: 'flex', margin: 0 }}>
                 <Toast show={showMessage} onClose={toggleShowMessage}>
                     <Toast.Header>

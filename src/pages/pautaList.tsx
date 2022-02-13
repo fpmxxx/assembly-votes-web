@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom";
-
 import { Container, Table } from "react-bootstrap";
 
 import api from '../utils/api';
+import Message from "../components/message";
 import Pagination from "../components/pagination";
 import { Pauta } from "../types/pauta"
 
 
 export default function PautaList() {
+    const [message, setMessage] = useState({ type: "", message: "" });
     const [listPauta, setListPauta] = useState<Pauta[]>([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
 
     useEffect(() => {
-        debugger
         const getListStave = async () => {
             await api.get('/v1/pauta/list', {
                 params: {
@@ -26,7 +26,10 @@ export default function PautaList() {
                     setTotalPage(res.data.totalPage);
                     setListPauta(res.data.listPauta);
                 })
-                .catch(err => console.log(err.message));
+                .catch(err => {
+                    const msg = { type: "danger", message: err.response ? JSON.stringify(err.response.data) : err.message };
+                    setMessage(msg);
+                });
         }
 
         getListStave();
@@ -37,26 +40,30 @@ export default function PautaList() {
     }
 
     return (
-        <Container>
-            <Table striped bordered hover className="mt-3">
-                <thead>
-                    <tr>
-                        <th>Pauta</th>
-                        <th>Votar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {listPauta.map(pauta =>
-                        <tr key={pauta.id}>
-                            <td>{pauta.nome}</td>
-                            <td><Link className="btn btn-success" to={`/vote/form/${pauta.id}/${pauta.nome}`}>Votar</Link></td>
+        <>
+            {message ? <Message message={message} /> : ""}
+
+            <Container>
+                <Table striped bordered hover className="mt-3">
+                    <thead>
+                        <tr>
+                            <th style={{ width: '50%' }}>Pauta</th>
+                            <th style={{ width: '50%' }}>Votar</th>
                         </tr>
-                    )}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {listPauta.map(pauta =>
+                            <tr key={pauta.id}>
+                                <td>{pauta.nome}</td>
+                                <td><Link className="btn btn-success" to={`/voto/form/${pauta.id}/${pauta.nome}`}>Votar</Link></td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
 
-            <Pagination totalPage={totalPage} onChange={handlePageChange} />
+                <Pagination totalPage={totalPage} onChange={handlePageChange} />
 
-        </Container>
+            </Container>
+        </>
     )
 }

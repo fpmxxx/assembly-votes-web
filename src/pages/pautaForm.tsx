@@ -1,11 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, FloatingLabel, Form, Row } from 'react-bootstrap';
 
 import api from '../utils/api';
 import Message from '../components/message';
+import { Pauta } from '../types/pauta';
 
 export default function PautaForm() {
+    const navigate = useNavigate();
+
     const [message, setMessage] = useState({ type: "", message: "" });
+    const [nome, setNome] = useState("");
+    const [minutosVotacao, setMinutosVotacao] = useState("");
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -13,19 +19,35 @@ export default function PautaForm() {
         const nome = (event.target as any).nome.value;
         const minutosVotacao = (event.target as any).minutosVotacao.value;
 
-        const request = { "nome": nome, "minutosVotacao": minutosVotacao}
+        const request = { "nome": nome, "minutosVotacao": minutosVotacao }
 
-        api.post('/v1/pauta/save', request)
+        await api.post('/v1/pauta/save', request)
             .then((res) => {
                 const msg = { type: "success", message: res.status === 200 ? "Cadastrado com sucesso" : "" };
                 setMessage(msg);
+
+                const data = res.data as Pauta;
+
+                navigate(`/voto/form/${data.id}/${data.nome}`);
             })
             .catch(err => {
-                console.log(err.response.data.message);
-
-                let msg = { type: "danger", message: err.response.data.message };
+                const msg = { type: "danger", message: err.response ? JSON.stringify(err.response.data) : err.message };
                 setMessage(msg);
             });
+    }
+
+    const handleChangeNome = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const re = /\S+/;
+        if (event.target.value === "" || re.test(event.target.value)) {
+            setNome(event.target.value);
+        }
+    }
+
+    const handleChangeMinutes = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const re = /^[0-9\b]+$/;
+        if (event.target.value === "" || re.test(event.target.value)) {
+            setMinutosVotacao(event.target.value);
+        }
     }
 
     return (
@@ -38,7 +60,9 @@ export default function PautaForm() {
                         <Col sm={7}>
                             <FloatingLabel label="Pauta">
                                 <Form.Control id="nome"
+                                    value={nome}
                                     type="text"
+                                    onChange={handleChangeNome}
                                     maxLength={50}>
                                 </Form.Control>
                             </FloatingLabel>
@@ -49,8 +73,9 @@ export default function PautaForm() {
                         <Col sm={2}>
                             <FloatingLabel label="Duração em minutos">
                                 <Form.Control id="minutosVotacao"
+                                    value={minutosVotacao}
                                     type="text"
-                                    onKeyDown={e => /[^0-9]/g.test(e.key) && e.preventDefault()}
+                                    onChange={handleChangeMinutes}
                                     maxLength={2}>
                                 </Form.Control>
                             </FloatingLabel>
