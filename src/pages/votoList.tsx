@@ -1,35 +1,36 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom";
 
 import { Container, Table } from "react-bootstrap";
 
 import api from '../utils/api';
 import Pagination from "../components/pagination";
-import { Pauta } from "../types/pauta"
+import { Voto } from "../types/voto";
 
-
-export default function PautaList() {
-    const [listPauta, setListPauta] = useState<Pauta[]>([]);
+export default function VotoList() {
+    const [listVoto, setListVoto] = useState<Voto[]>([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
 
     useEffect(() => {
         debugger
-        const getListStave = async () => {
-            await api.get('/v1/pauta/list', {
+
+        const getListVote = async () => {
+            await api.get('/v1/voto/list', {
                 params: {
                     page: pageNumber,
                     size: 5
                 }
             })
                 .then((res) => {
+                    debugger
                     setTotalPage(res.data.totalPage);
-                    setListPauta(res.data.listPauta);
+                    setListVoto(res.data.listVotoDTO);
                 })
                 .catch(err => console.log(err.message));
         }
 
-        getListStave();
+        getListVote();
+
     }, [pageNumber]);
 
     const handlePageChange = (newPageNumber: number) => {
@@ -42,14 +43,16 @@ export default function PautaList() {
                 <thead>
                     <tr>
                         <th>Pauta</th>
-                        <th>Votar</th>
+                        <th>Voto</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {listPauta.map(pauta =>
-                        <tr key={pauta.id}>
-                            <td>{pauta.nome}</td>
-                            <td><Link className="btn btn-success" to={`/vote/form/${pauta.id}/${pauta.nome}`}>Votar</Link></td>
+                    {listVoto.map(voto =>
+                        <tr key={voto.pautaId}>
+                            <td>{voto.pauta}</td>
+                            <td>{voto.voto ? 'Sim' : 'Não'}</td>
+                            <td>{voto.quantidadeVotos}</td>
                         </tr>
                     )}
                 </tbody>
