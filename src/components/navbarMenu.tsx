@@ -9,10 +9,10 @@ export default function NavbarMenu() {
                 <Nav.Item as="li">
                     <Link className="nav-link" to="/">Cadastrar Pauta</Link>
                 </Nav.Item>
-                {/* <Nav.Item as="li">
+                 <Nav.Item as="li">
                     <Link className="nav-link" to="/pauta/list">Votar Pauta</Link>
                 </Nav.Item>
-                <Nav.Item as="li">
+                {/*<Nav.Item as="li">
                     <Link className="nav-link" to="/voto/list">Votos</Link>
                 </Nav.Item> */}
             </Nav>
