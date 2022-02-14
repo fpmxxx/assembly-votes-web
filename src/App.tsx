@@ -22,8 +22,3 @@ export default function App() {
 		</div>
 	)
 }
-
-// -desligar servidor e tratar erros
-// -fazer loading
-// cadastro espaco
-// apagar minutos

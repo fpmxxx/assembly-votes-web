@@ -6,7 +6,6 @@ type Props = {
     totalPage: number;
     onChange: Function;
 }
-
 export default function Pagination({ totalPage, onChange } : Props) {
     const [page, setPage] = useState<Page>({
         currentPage: 0,

@@ -3,10 +3,13 @@ import { useParams } from 'react-router-dom';
 import { Button, Col, Container, FloatingLabel, Form, Row } from 'react-bootstrap';
 
 import api from '../utils/api';
+import Loading from '../components/loading';
 import Message from '../components/message';
 
 export default function VotoForm() {
+    const [loading, setLoading] = useState({ showLoading: false});
     const [message, setMessage] = useState({ type: "", message: "" });
+
     const [cpf, setCpf] = useState("");
 
     const params = useParams();
@@ -15,15 +18,18 @@ export default function VotoForm() {
         if (cpf) {
             const request = { "cpf": cpf, pautaId: Number(params.id), voto: votoSelected };
 
+            setLoading({ showLoading: true });
             await api.post('/v1/voto/save', request)
                 .then((res) => {
                     const msg = { type: "success", message: res.data.message };
                     setMessage(msg);
                     setCpf("");
+                    setLoading({ showLoading: false });
                 })
                 .catch(err => {
                     const msg = { type: "danger", message: err.response ? JSON.stringify(err.response.data) : err.message };
                     setMessage(msg);
+                    setLoading({ showLoading: false });
                 });
         } else {
             const msg = { type: "warning", message: "Informe um CPF" };
@@ -43,7 +49,8 @@ export default function VotoForm() {
 
     return (
         <>
-            {message ? <Message message={message} /> : ""}
+            <Loading loading={loading} />
+            <Message message={message} />
 
             <Container>
                 <Row className="justify-content-center mt-3">

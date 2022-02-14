@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, FloatingLabel, Form, Row } from 'react-bootstrap';
 
 import api from '../utils/api';
+import Loading from '../components/loading';
 import Message from '../components/message';
 import { Pauta } from '../types/pauta';
 
 export default function PautaForm() {
     const navigate = useNavigate();
 
+    const [loading, setLoading] = useState({ showLoading: false});
     const [message, setMessage] = useState({ type: "", message: "" });
     const [nome, setNome] = useState("");
     const [minutosVotacao, setMinutosVotacao] = useState("");
@@ -21,6 +23,7 @@ export default function PautaForm() {
 
         const request = { "nome": nome, "minutosVotacao": minutosVotacao }
 
+        setLoading({ showLoading: true });
         await api.post('/v1/pauta/save', request)
             .then((res) => {
                 const msg = { type: "success", message: res.status === 200 ? "Cadastrado com sucesso" : "" };
@@ -29,10 +32,12 @@ export default function PautaForm() {
                 const data = res.data as Pauta;
 
                 navigate(`/voto/form/${data.id}/${data.nome}`);
+                setLoading({ showLoading: false });
             })
             .catch(err => {
                 const msg = { type: "danger", message: err.response ? JSON.stringify(err.response.data) : err.message };
                 setMessage(msg);
+                setLoading({ showLoading: false });
             });
     }
 
@@ -52,7 +57,8 @@ export default function PautaForm() {
 
     return (
         <>
-            {message ? <Message message={message} /> : ""}
+            <Loading loading={loading} />
+            <Message message={message} />
 
             <Container>
                 <Form onSubmit={onSubmit}>

@@ -2,18 +2,22 @@ import { useEffect, useState } from "react"
 import { Container, Table } from "react-bootstrap";
 
 import api from '../utils/api';
+import Loading from '../components/loading';
 import Message from "../components/message";
 import Pagination from "../components/pagination";
 import { Voto } from "../types/voto";
 
 export default function VotoList() {
+    const [loading, setLoading] = useState({ showLoading: false});
     const [message, setMessage] = useState({ type: "", message: "" });
+
     const [listVoto, setListVoto] = useState<Voto[]>([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
 
     useEffect(() => {
         const getListVote = async () => {
+            setLoading({ showLoading: true });
             await api.get('/v1/voto/list', {
                 params: {
                     page: pageNumber,
@@ -22,11 +26,13 @@ export default function VotoList() {
             })
                 .then((res) => {
                     setTotalPage(res.data.totalPage);
-                    setListVoto(res.data.listVotoDTO);
+                    setListVoto(res.data.listVoto);
+                    setLoading({ showLoading: false });
                 })
                 .catch(err => {
                     const msg = { type: "danger", message: err.response ? JSON.stringify(err.response.data) : err.message };
                     setMessage(msg);
+                    setLoading({ showLoading: false });
                 });
 
         }
@@ -41,7 +47,8 @@ export default function VotoList() {
 
     return (
         <>
-            {message ? <Message message={message} /> : ""}
+            <Loading loading={loading} />
+            <Message message={message} />
 
             <Container>
                 <Table striped bordered hover className="mt-3">
