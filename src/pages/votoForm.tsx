@@ -74,14 +74,14 @@ export default function VotoForm() {
                     </Row>
 
                     <Row className="justify-content-center mt-3">
-                        <Col sm={1}>
+                        <Col xs="auto">
                             <Button
                                 variant="success"
                                 onClick={() => saveVoto(true)}>
                                 Sim
                             </Button>
                         </Col>
-                        <Col sm={1}>
+                        <Col xs="auto">
                             <Button
                                 variant="danger"
                                 onClick={() => saveVoto(false)}>
